@@ -32,7 +32,7 @@ const PageTemplateHeader = `<html>
 <h2>Page %s out of %s</h2>
 <a href="/%s">previous</a> | <a href="/%s">next</a>
 <pre class="keys">
-<strong>Private Key</strong>                                            <strong>Address</strong><strong>balance</strong>                <strong>Compressed Address</strong><strong>balance</strong>
+<strong>Private Key</strong>                                            <strong>Address</strong>   <strong>balance</strong>                <strong>Compressed Address</strong>   <strong>balance</strong>
 `
 
 const PageTemplateFooter = `</pre>
@@ -43,7 +43,7 @@ It took a lot of computing power to generate this database. Donations welcome: 1
 </body>
 </html>`
 
-const KeyTemplate = `<span id="%s"><a href="/warning:understand-how-this-works!/%s">+</a> <span title="%s">%s </span> <a href="https://blockchain.info/address/%s">%34s</a>%3s <a href="https://blockchain.info/address/%s">%34s</a>%3s</span>
+const KeyTemplate = `<span id="%s"><a href="/warning:understand-how-this-works!/%s">+</a> <span title="%s">%s </span> <a href="https://blockchain.info/address/%s">%34s</a> %d <a href="https://blockchain.info/address/%s">%34s</a> %d </span>
 `
 
 var (
