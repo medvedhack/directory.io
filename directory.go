@@ -77,7 +77,7 @@ func check_balance1(address string,ch chan int) {
 		log.Fatalf("Checking balance (uncomp): %s\n", err)
 	}
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, _ := ioutil.ReadAll(resp.Body)
 	bodystring := string(body)
 	balance,_ := strconv.Atoi(bodystring)
 	//return strconv.Atoi(bodystring)
@@ -91,7 +91,7 @@ func check_balance2(address string,ch chan int) {
 		log.Fatalf("Checking balance (uncomp): %s\n", err)
 	}
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, _ := ioutil.ReadAll(resp.Body)
 	bodystring := string(body)
 	balance,_ := strconv.Atoi(bodystring)
 	//return strconv.Atoi(bodystring)
