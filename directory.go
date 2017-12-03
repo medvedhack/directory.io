@@ -79,8 +79,9 @@ func check_balance1(address string,ch chan int) {
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	bodystring := string(body)
+	balance,_ := strconv.Atoi(bodystring)
 	//return strconv.Atoi(bodystring)
-	ch <- strconv.Atoi(bodystring)
+	ch <- balance
 }
 
 func check_balance2(address string,ch chan int) {
@@ -92,8 +93,9 @@ func check_balance2(address string,ch chan int) {
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	bodystring := string(body)
+	balance,_ := strconv.Atoi(bodystring)
 	//return strconv.Atoi(bodystring)
-	ch <- strconv.Atoi(bodystring)
+	ch <- balance
 }
 
 func compute(count *big.Int) (keys [ResultsPerPage]Key, length int) {
