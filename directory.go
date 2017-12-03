@@ -5,13 +5,14 @@ import (
 	"log"
 	"math/big"
 	"net/http"
-
+	"io/ioutil"
+	"strconv"
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcutil"
 )
 
-const ResultsPerPage = 128
+const ResultsPerPage = 50
 
 const PageTemplateHeader = `<html>
 <head>
@@ -64,7 +65,21 @@ type Key struct {
 	private      string
 	number       string
 	compressed   string
+        cb           int
 	uncompressed string
+        ucb          int
+}
+
+func check_balance(address string) (int, error) {
+	query_comp := "https://blockchain.info/q/addressbalance/" + address
+	resp, err := http.Get(query_comp)
+	if err != nil {
+		// handle error
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	bodystring := string(body)
+	return strconv.Atoi(bodystring)
 }
 
 func compute(count *big.Int) (keys [ResultsPerPage]Key, length int) {
@@ -74,12 +89,9 @@ func compute(count *big.Int) (keys [ResultsPerPage]Key, length int) {
 	for i = 0; i < ResultsPerPage; i++ {
 		// Increment our counter
 		count.Add(count, one)
-
-		// Check to make sure we're not out of range
 		if count.Cmp(total) > 0 {
 			break
 		}
-
 		// Copy count value's bytes to padded slice
 		copy(padded[32-len(count.Bytes()):], count.Bytes())
 
@@ -87,7 +99,7 @@ func compute(count *big.Int) (keys [ResultsPerPage]Key, length int) {
 		privKey, public := btcec.PrivKeyFromBytes(btcec.S256(), padded[:])
 
 		// Get compressed and uncompressed addresses for public key
-		caddr, _ := btcutil.NewAddressPubKey(public.SerializeCompressed(), &chaincfg.MainNetParams)
+		caddr, err := btcutil.NewAddressPubKey(public.SerializeCompressed(), &chaincfg.MainNetParams)
 		uaddr, _ := btcutil.NewAddressPubKey(public.SerializeUncompressed(), &chaincfg.MainNetParams)
 
 		// Encode addresses
@@ -96,6 +108,19 @@ func compute(count *big.Int) (keys [ResultsPerPage]Key, length int) {
 		keys[i].number = count.String()
 		keys[i].compressed = caddr.EncodeAddress()
 		keys[i].uncompressed = uaddr.EncodeAddress()
+                var com_balance, uncom_balance int
+		com_balance, err = check_balance(caddr.EncodeAddress())
+		if err != nil {
+			log.Fatalf("Checking balance (comp): %s\n", err)
+		}
+		//time.Sleep(time.Duration(1) * time.Second)
+		uncom_balance, err = check_balance(uaddr.EncodeAddress())
+		if err != nil {
+			log.Fatalf("Checking balance (uncomp): %s\n", err)
+		}
+		keys[i].cb=com_balance
+		keys[i].ucb=uncom_balance
+		fmt.Println(com_balance)
 	}
 	return keys, i
 }
@@ -139,7 +164,7 @@ func PageRequest(w http.ResponseWriter, r *http.Request) {
 	keys, length := compute(start)
 	for i := 0; i < length; i++ {
 		key := keys[i]
-		fmt.Fprintf(w, KeyTemplate, key.private, key.private, key.number, key.private, key.uncompressed, key.uncompressed, key.compressed, key.compressed)
+		fmt.Fprintf(w, KeyTemplate, key.private, key.private, key.number, key.private, key.uncompressed, key.uncompressed, key.ucb, key.ucb, key.compressed, key.compressed, key.cb, key.cb)
 	}
 
 	// Send page footer
