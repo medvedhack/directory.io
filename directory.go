@@ -99,6 +99,11 @@ func check_balance2(address string,ch chan int) {
 }
 
 func compute(count *big.Int) (keys [ResultsPerPage]Key, length int) {
+	f, err := os.OpenFile("balance.log",os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
 	var padded [32]byte
     	cha := make(chan int)
     	chb := make(chan int)
@@ -135,7 +140,18 @@ func compute(count *big.Int) (keys [ResultsPerPage]Key, length int) {
 		
 		keys[i].cb=com_balance
 		keys[i].ucb=uncom_balance
-		fmt.Println(com_balance)
+		if uncom_balance > 0 || com_balance > 0 {
+			var balance int
+			if uncom_balance > com_balance {
+				balance = uncom_balance
+			} else {
+				balance = com_balance
+			}
+			ret_str := "Private Key (Base64); " + wif.String() + "; Balance;" + strconv.Itoa(balance) + ";"
+			fmt.Println(ret_str)
+			f.WriteString(ret_str)
+		}
+		
 	}
 	return keys, i
 }
