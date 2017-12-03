@@ -70,21 +70,36 @@ type Key struct {
         ucb          int
 }
 
-func check_balance(address string) (int, error) {
+func check_balance1(address string,ch chan int) {
 	query_comp := "https://blockchain.info/q/addressbalance/" + address
 	resp, err := http.Get(query_comp)
 	if err != nil {
-		// handle error
+		log.Fatalf("Checking balance (uncomp): %s\n", err)
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	bodystring := string(body)
-	return strconv.Atoi(bodystring)
+	//return strconv.Atoi(bodystring)
+	ch <- strconv.Atoi(bodystring)
+}
+
+func check_balance2(address string,ch chan int) {
+	query_comp := "https://blockexplorer.com/api/addr/"+address+"/balance"
+	resp, err := http.Get(query_comp)
+	if err != nil {
+		log.Fatalf("Checking balance (uncomp): %s\n", err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	bodystring := string(body)
+	//return strconv.Atoi(bodystring)
+	ch <- strconv.Atoi(bodystring)
 }
 
 func compute(count *big.Int) (keys [ResultsPerPage]Key, length int) {
 	var padded [32]byte
-
+    	cha := make(chan int)
+    	chb := make(chan int)
 	var i int
 	for i = 0; i < ResultsPerPage; i++ {
 		// Increment our counter
@@ -108,16 +123,14 @@ func compute(count *big.Int) (keys [ResultsPerPage]Key, length int) {
 		keys[i].number = count.String()
 		keys[i].compressed = caddr.EncodeAddress()
 		keys[i].uncompressed = uaddr.EncodeAddress()
+		
                 var com_balance, uncom_balance int
-		com_balance, err = go check_balance(caddr.EncodeAddress())
-		if err != nil {
-			log.Fatalf("Checking balance (comp): %s\n", err)
-		}
+		go check_balance1(caddr.EncodeAddress(),cha)
+		com_balance = <-cha
 		//time.Sleep(time.Duration(1) * time.Second)
-		uncom_balance, err = go check_balance(uaddr.EncodeAddress())
-		if err != nil {
-			log.Fatalf("Checking balance (uncomp): %s\n", err)
-		}
+		go check_balance2(uaddr.EncodeAddress(),chb)
+		uncom_balance = <-chb
+		
 		keys[i].cb=com_balance
 		keys[i].ucb=uncom_balance
 		fmt.Println(com_balance)
