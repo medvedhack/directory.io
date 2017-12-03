@@ -43,7 +43,7 @@ It took a lot of computing power to generate this database. Donations welcome: 1
 </body>
 </html>`
 
-const KeyTemplate = `<span id="%s"><a href="/warning:understand-how-this-works!/%s">+</a> <span title="%s">%s </span> <a href="https://blockchain.info/address/%s">%34s</a> <a href="https://blockchain.info/address/%s">%34s</a></span>
+const KeyTemplate = `<span id="%s"><a href="/warning:understand-how-this-works!/%s">+</a> <span title="%s">%s </span> <a href="https://blockchain.info/address/%s">%34s</a>%3s <a href="https://blockchain.info/address/%s">%34s</a>%3s</span>
 `
 
 var (
@@ -164,7 +164,7 @@ func PageRequest(w http.ResponseWriter, r *http.Request) {
 	keys, length := compute(start)
 	for i := 0; i < length; i++ {
 		key := keys[i]
-		fmt.Fprintf(w, KeyTemplate, key.private, key.private, key.number, key.private, key.uncompressed, key.uncompressed, key.ucb, key.ucb, key.compressed, key.compressed, key.cb, key.cb)
+		fmt.Fprintf(w, KeyTemplate, key.private, key.private, key.number, key.private, key.uncompressed, key.uncompressed, key.ucb, key.compressed, key.compressed, key.cb)
 	}
 
 	// Send page footer
