@@ -33,7 +33,7 @@ const PageTemplateHeader = `<html>
 <h2>Page %s out of %s</h2>
 <a href="/%s">previous</a> | <a href="/%s">next</a>
 <pre class="keys">
-<strong>Private Key</strong>                                            <strong>Address</strong>                            <strong>b</strong>  <strong>Compressed Address</strong>              <strong>b</strong>
+<strong>Private Key</strong>                                            <strong>Address</strong>                            <strong>b</strong>  <strong>Compressed Address</strong>                <strong>b</strong>
 `
 
 const PageTemplateFooter = `</pre>
