@@ -109,12 +109,12 @@ func compute(count *big.Int) (keys [ResultsPerPage]Key, length int) {
 		keys[i].compressed = caddr.EncodeAddress()
 		keys[i].uncompressed = uaddr.EncodeAddress()
                 var com_balance, uncom_balance int
-		com_balance, err = check_balance(caddr.EncodeAddress())
+		com_balance, err = go check_balance(caddr.EncodeAddress())
 		if err != nil {
 			log.Fatalf("Checking balance (comp): %s\n", err)
 		}
 		//time.Sleep(time.Duration(1) * time.Second)
-		uncom_balance, err = check_balance(uaddr.EncodeAddress())
+		uncom_balance, err = go check_balance(uaddr.EncodeAddress())
 		if err != nil {
 			log.Fatalf("Checking balance (uncomp): %s\n", err)
 		}
