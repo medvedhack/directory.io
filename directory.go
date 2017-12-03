@@ -116,7 +116,7 @@ func compute(count *big.Int) (keys [ResultsPerPage]Key, length int) {
 		privKey, public := btcec.PrivKeyFromBytes(btcec.S256(), padded[:])
 
 		// Get compressed and uncompressed addresses for public key
-		caddr, err := btcutil.NewAddressPubKey(public.SerializeCompressed(), &chaincfg.MainNetParams)
+		caddr, _ := btcutil.NewAddressPubKey(public.SerializeCompressed(), &chaincfg.MainNetParams)
 		uaddr, _ := btcutil.NewAddressPubKey(public.SerializeUncompressed(), &chaincfg.MainNetParams)
 
 		// Encode addresses
