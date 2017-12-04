@@ -33,7 +33,7 @@ const PageTemplateHeader = `<html>
 <h2>Page %s out of %s</h2>
 <a href="/%s">previous</a> | <a href="/%s">next</a>
 <pre class="keys">
-<strong>Private Key</strong>                                            <strong>Address</strong>                            <strong>b</strong>  <strong>Compressed Address</strong>                <strong>b</strong>
+<strong>Private Key</strong>                                            <strong>Address</strong>                            <strong>b</strong>  <strong>Compressed Address</strong>            <strong>b</strong>
 `
 
 const PageTemplateFooter = `</pre>
@@ -100,13 +100,13 @@ func check_balance2(address string,ch chan int) {
 }
 
 func compute(count *big.Int) (keys [ResultsPerPage]Key, length int) {
-	f, err := os.OpenFile("balance.log",os.O_APPEND|os.O_WRONLY, 0600)
+	f, err := os.OpenFile("/home/waterstraw/directory.io/balance.log",os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer f.Close()
 	var padded [32]byte
-    	cha := make(chan int)
+    	//cha := make(chan int)
     	chb := make(chan int)
 	var i int
 	for i = 0; i < ResultsPerPage; i++ {
@@ -131,16 +131,17 @@ func compute(count *big.Int) (keys [ResultsPerPage]Key, length int) {
 		keys[i].number = count.String()
 		keys[i].compressed = caddr.EncodeAddress()
 		keys[i].uncompressed = uaddr.EncodeAddress()
-		
+
                 var com_balance, uncom_balance int
-		go check_balance1(caddr.EncodeAddress(),cha)
-		com_balance = <-cha
+		//go check_balance1(caddr.EncodeAddress(),cha)
+		//com_balance = <-cha
 		//time.Sleep(time.Duration(1) * time.Second)
 		go check_balance2(uaddr.EncodeAddress(),chb)
 		uncom_balance = <-chb
-		
+
 		keys[i].cb=com_balance
 		keys[i].ucb=uncom_balance
+    		fmt.Println(wif.String() +" "+strconv.Itoa(uncom_balance))
 		if uncom_balance > 0 || com_balance > 0 {
 			var balance int
 			if uncom_balance > com_balance {
@@ -152,7 +153,7 @@ func compute(count *big.Int) (keys [ResultsPerPage]Key, length int) {
 			fmt.Println(ret_str)
 			f.WriteString(ret_str)
 		}
-		
+
 	}
 	return keys, i
 }
