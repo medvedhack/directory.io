@@ -39,9 +39,9 @@ const PageTemplateHeader = `<html>
 
 const PageTemplateFooter = `</pre>
 <pre style="margin-top: 1em; font-size: 8pt">
-It took a lot of computing power to generate this database. Donations welcome: 1Bv8dN7pemC5N3urfMDdAFReibefrBqCaK
+It took a lot of computing power to generate this database. Donations welcome: 1LdHnyauFSW1dkvD4xf7FSQN3m6fK3ShiS
 </pre>
-<a href="/%s">previous</a> | <a href="/%s">next</a>
+<a href="/%s">                             previous</a> |                             <a href="/%s"><strong>next</strong> </a>
 </body>
 </html>`
 
