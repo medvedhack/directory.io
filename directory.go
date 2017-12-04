@@ -45,7 +45,7 @@ It took a lot of computing power to generate this database. Donations welcome: 1
 </body>
 </html>`
 
-const KeyTemplate = `<span id="%s"><a href="/warning:understand-how-this-works!/%s">+</a> <span title="%s">%s </span> <a href="https://blockchain.info/address/%s">%34s</a> %d <a href="https://blockchain.info/address/%s">%34s</a> %d </span>
+const KeyTemplate = `<span id="%s"><a href="/warning:understand-how-this-works!/%s">+</a> <span title="%s">%s </span> <a href="https://blockchain.info/address/%s">%34s</a> <strong>%d</strong>  <a href="https://blockchain.info/address/%s">%34s</a> %d </span>
 `
 
 var (
