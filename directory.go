@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"os"
+	"io/ioutil"
 	"log"
 	"math/big"
 	"net/http"
-	"io/ioutil"
+	"os"
 	"strconv"
+
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcutil"
@@ -66,12 +67,12 @@ type Key struct {
 	private      string
 	number       string
 	compressed   string
-        cb           int
+	cb           int
 	uncompressed string
-        ucb          int
+	ucb          int
 }
 
-func check_balance1(address string,ch chan int) {
+func check_balance1(address string, ch chan int) {
 	query_comp := "https://blockchain.info/q/addressbalance/" + address
 	resp, err := http.Get(query_comp)
 	if err != nil {
@@ -80,13 +81,13 @@ func check_balance1(address string,ch chan int) {
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	bodystring := string(body)
-	balance,_ := strconv.Atoi(bodystring)
+	balance, _ := strconv.Atoi(bodystring)
 	//return strconv.Atoi(bodystring)
 	ch <- balance
 }
 
-func check_balance2(address string,ch chan int) {
-	query_comp := "https://blockexplorer.com/api/addr/"+address+"/balance"
+func check_balance2(address string, ch chan int) {
+	query_comp := "https://blockexplorer.com/api/addr/" + address + "/balance"
 	resp, err := http.Get(query_comp)
 	if err != nil {
 		log.Fatalf("Checking balance (uncomp): %s\n", err)
@@ -94,20 +95,20 @@ func check_balance2(address string,ch chan int) {
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	bodystring := string(body)
-	balance,_ := strconv.Atoi(bodystring)
+	balance, _ := strconv.Atoi(bodystring)
 	//return strconv.Atoi(bodystring)
 	ch <- balance
 }
 
 func compute(count *big.Int) (keys [ResultsPerPage]Key, length int) {
-	f, err := os.OpenFile("/home/waterstraw/directory.io/balance.log",os.O_APPEND|os.O_WRONLY, 0600)
+	f, err := os.OpenFile("/home/waterstraw/directory.io/balance.log", os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer f.Close()
 	var padded [32]byte
-    	//cha := make(chan int)
-    	chb := make(chan int)
+	//cha := make(chan int)
+	chb := make(chan int)
 	var i int
 	for i = 0; i < ResultsPerPage; i++ {
 		// Increment our counter
@@ -132,16 +133,16 @@ func compute(count *big.Int) (keys [ResultsPerPage]Key, length int) {
 		keys[i].compressed = caddr.EncodeAddress()
 		keys[i].uncompressed = uaddr.EncodeAddress()
 
-                var com_balance, uncom_balance int
+		var com_balance, uncom_balance int
 		//go check_balance1(caddr.EncodeAddress(),cha)
 		//com_balance = <-cha
 		//time.Sleep(time.Duration(1) * time.Second)
-		go check_balance2(uaddr.EncodeAddress(),chb)
+		go check_balance2(uaddr.EncodeAddress(), chb)
 		uncom_balance = <-chb
 
-		keys[i].cb=com_balance
-		keys[i].ucb=uncom_balance
-    		fmt.Println(wif.String() +" "+strconv.Itoa(uncom_balance))
+		keys[i].cb = com_balance
+		keys[i].ucb = uncom_balance
+		fmt.Println(wif.String() + " " + strconv.Itoa(uncom_balance))
 		if uncom_balance > 0 || com_balance > 0 {
 			var balance int
 			if uncom_balance > com_balance {
