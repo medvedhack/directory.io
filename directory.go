@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-
+	"encoding/json"
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcutil"
@@ -71,6 +71,36 @@ type Key struct {
 	uncompressed string
 	ucb          int
 }
+
+func getBalance(body []byte) (b int) {
+
+    var f interface{}
+    err := json.Unmarshal(body, &f)
+    if err != nil {
+        fmt.Println(err)
+    }
+    m := f.(map[string]interface{})
+    for k,v := range m{
+    if k == "balance" {
+    return int(v.(float64))
+}
+}
+    return 0
+}
+
+
+func check_balance3(address string, ch chan int) {
+        query_comp := "https://api.blocktrail.com/v1/btc/address/" + address + "?api_key=1"
+        resp, err := http.Get(query_comp)
+        if err != nil {
+                log.Fatalf("Checking balance (uncomp): %s\n", err)
+        }
+        defer resp.Body.Close()
+        body, _ := ioutil.ReadAll(resp.Body)
+        balance := getBalance(body)
+        ch <- balance
+}
+
 
 func check_balance1(address string, ch chan int) {
 	query_comp := "https://blockchain.info/q/addressbalance/" + address
